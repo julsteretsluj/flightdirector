@@ -3,25 +3,54 @@
 const fs = require('fs');
 const path = require('path');
 
-const { emitWarning } = process;
-process.emitWarning = function emit(warning, ...args) {
-  const text = typeof warning === 'string' ? warning : warning?.message;
-  if (text && text.includes('SQLite is an experimental feature')) return undefined;
-  return emitWarning.call(process, warning, ...args);
-};
+const { Database } = require('node-sqlite3-wasm');
 
-let DatabaseSync;
-try {
-  ({ DatabaseSync } = require('node:sqlite'));
-} catch {
-  console.error('This bot needs Node.js 22.13 or newer for its built-in database.');
-  process.exit(1);
+function statement(raw, sql) {
+  return {
+    get(...params) {
+      const stmt = raw.prepare(sql);
+      try {
+        const row = params.length ? stmt.get(params) : stmt.get();
+        return row == null ? undefined : row;
+      } finally {
+        stmt.finalize();
+      }
+    },
+    all(...params) {
+      const stmt = raw.prepare(sql);
+      try {
+        return params.length ? stmt.all(params) : stmt.all();
+      } finally {
+        stmt.finalize();
+      }
+    },
+    run(...params) {
+      const stmt = raw.prepare(sql);
+      try {
+        const result = params.length ? stmt.run(params) : stmt.run();
+        return {
+          changes: Number(result?.changes || 0),
+          lastInsertRowid: Number(result?.lastInsertRowid || 0),
+        };
+      } finally {
+        stmt.finalize();
+      }
+    },
+  };
 }
 
 const dir = process.env.DATA_DIR || path.join(process.cwd(), 'data');
 fs.mkdirSync(dir, { recursive: true });
 
-const db = new DatabaseSync(path.join(dir, '0gbot.sqlite'));
+const raw = new Database(path.join(dir, '0gbot.sqlite'));
+const db = {
+  exec(sql) {
+    raw.exec(sql);
+  },
+  prepare(sql) {
+    return statement(raw, sql);
+  },
+};
 db.exec('PRAGMA journal_mode = WAL;');
 db.exec('PRAGMA foreign_keys = ON;');
 db.exec('PRAGMA busy_timeout = 3000;');

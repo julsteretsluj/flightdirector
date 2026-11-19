@@ -4,7 +4,7 @@ A Discord bot for a small community: a server shop and currency, Carrd-style pro
 
 ## Setup
 
-You need Node.js 22.13 or newer.
+You need Node.js 20 or newer.
 
 1. Create an application at <https://discord.com/developers/applications>.
 2. Open **Bot** and reset the token. Turn on the **Message Content** and **Server Members** intents. Proxying, automod, and edit logs need Message Content. Join alerts, welcome messages, and starting currency need Server Members.
