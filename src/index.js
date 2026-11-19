@@ -1,5 +1,7 @@
 'use strict';
 
+require('./ensure-deps');
+
 const { Client, GatewayIntentBits, Partials, Events } = require('discord.js');
 const { token } = require('./config');
 const { loadCommands } = require('./load-commands');
