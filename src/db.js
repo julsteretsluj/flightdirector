@@ -42,7 +42,42 @@ function statement(raw, sql) {
 const dir = process.env.DATA_DIR || path.join(process.cwd(), 'data');
 fs.mkdirSync(dir, { recursive: true });
 
-const raw = new Database(path.join(dir, '0gbot.sqlite'));
+const file = path.join(dir, '0gbot.sqlite');
+
+function sleep(ms) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+}
+
+function clearStaleLocks(dbFile) {
+  for (const suffix of ['', '-wal', '-shm', '-journal']) {
+    fs.rmSync(`${dbFile}${suffix}.lock`, { recursive: true, force: true });
+  }
+}
+
+function openDatabase(dbFile) {
+  let last;
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    clearStaleLocks(dbFile);
+    let opened;
+    try {
+      opened = new Database(dbFile);
+      opened.exec('PRAGMA busy_timeout = 3000;');
+      opened.exec('PRAGMA journal_mode = DELETE;');
+      opened.exec('PRAGMA foreign_keys = ON;');
+      return opened;
+    } catch (error) {
+      last = error;
+      if (opened) {
+        try { opened.close(); } catch { /* the handle may already be closed */ }
+      }
+      if (!/locked|busy/i.test(String(error && error.message)) || attempt === 4) throw error;
+      sleep(400);
+    }
+  }
+  throw last;
+}
+
+const raw = openDatabase(file);
 const db = {
   exec(sql) {
     raw.exec(sql);
@@ -51,9 +86,6 @@ const db = {
     return statement(raw, sql);
   },
 };
-db.exec('PRAGMA journal_mode = WAL;');
-db.exec('PRAGMA foreign_keys = ON;');
-db.exec('PRAGMA busy_timeout = 3000;');
 
 db.exec(`
 CREATE TABLE IF NOT EXISTS guild_settings (
