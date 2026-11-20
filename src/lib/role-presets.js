@@ -71,4 +71,22 @@ const age = {
   ],
 };
 
-module.exports = { rolePresets: { neurotypes, pronouns, boundaries, age } };
+const origins = {
+  title: '🌍 origins & culture (optional)',
+  description: 'optional cultural or ethnic identity roles. skip any or all if you prefer not to share.',
+  color: NIGHT,
+  roles: [
+    { emoji: '🌍', name: '🌍・black / african' },
+    { emoji: '🌏', name: '🌏・east asian' },
+    { emoji: '🪔', name: '🪔・south asian' },
+    { emoji: '🌴', name: '🌴・southeast asian' },
+    { emoji: '🏜️', name: '🏜️・mena' },
+    { emoji: '☀️', name: '☀️・hispanic / latine' },
+    { emoji: '🪶', name: '🪶・indigenous' },
+    { emoji: '❄️', name: '❄️・white / european' },
+    { emoji: '🌗', name: '🌗・multiracial / mixed' },
+    { emoji: '🛸', name: '🛸・prefer not to say' },
+  ],
+};
+
+module.exports = { rolePresets: { neurotypes, pronouns, boundaries, age, origins } };

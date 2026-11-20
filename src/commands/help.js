@@ -30,7 +30,7 @@ const TOPICS = {
       'Reaction mode needs an emoji on every role. Button mode can use a label alone.',
       'Exclusive panels keep a single role from that panel.',
       'Use the same panel for pronouns, communication preferences, ping roles, or access to a private channel. Give that role permission to see the channel in its settings. The bot only toggles the role.',
-      '`/reactionrole preset preset:neurotypes channel:#crew-manifest` posts the neurotype list. `preset:pronouns` posts pronouns. `preset:boundaries` posts comms and dm preferences. `preset:age` posts age brackets, and picking one removes the others. Each reaction toggles its role, and missing roles are created.',
+      '`/reactionrole preset preset:neurotypes channel:#crew-manifest` posts the neurotype list. `preset:pronouns` posts pronouns. `preset:boundaries` posts comms and dm preferences. `preset:age` posts age brackets, and picking one removes the others. `preset:origins` posts optional cultural identities. Each reaction toggles its role, and missing roles are created.',
       '`/reactionrole remove` and `/reactionrole delete` take the same message link.',
     ].join('\n'),
   },

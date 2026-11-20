@@ -98,6 +98,7 @@ module.exports = {
           { name: 'pronouns', value: 'pronouns' },
           { name: 'boundaries', value: 'boundaries' },
           { name: 'age', value: 'age' },
+          { name: 'origins', value: 'origins' },
         ))
       .addChannelOption((option) => option
         .setName('channel')
