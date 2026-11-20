@@ -11,6 +11,7 @@ const { loadCommands } = require('./load-commands');
 const db = require('./db');
 const parse = require('./lib/parse');
 const { emptyPayload, isEmptyPayload, buildStoredEmbed } = require('./lib/stored-embed');
+const { presets, payloadLength } = require('./lib/presets');
 const { pageBody, renderPage } = require('./lib/page');
 const { renderPoll } = require('./features/polls');
 
@@ -180,6 +181,22 @@ db.createEmbed('guild', 'welcome', { ...emptyPayload(), title: 'Welcome' }, 'own
 assert(db.embedNames('guild').includes('welcome'), 'embed list');
 assert(db.getEmbed('guild', 'welcome').payload.title === 'Welcome', 'embed read');
 assert(db.deleteEmbed('guild', 'welcome') === 1, 'embed delete');
+
+for (const [name, payload] of Object.entries(presets)) {
+  const text = [
+    payload.title,
+    payload.description,
+    payload.footer?.text,
+    ...(payload.fields || []).flatMap((field) => [field.name, field.value]),
+  ].join('\n');
+  assert(!/[A-Z]/.test(text), `${name} stays lowercase`);
+  assert(payloadLength(payload) <= 6000, `${name} embed size`);
+  assert((payload.fields || []).length <= 25, `${name} field count`);
+  for (const field of payload.fields || []) {
+    assert(field.name.length <= 256 && field.value.length > 0 && field.value.length <= 1024, `${name} field ${field.name}`);
+  }
+  assert(buildStoredEmbed(payload).data.title === payload.title, `${name} builds`);
+}
 
 const { matchProxy, proxyName } = require('./lib/proxy-match');
 const { hasInvite, spamVerdict, advancePhase } = require('./lib/guard');

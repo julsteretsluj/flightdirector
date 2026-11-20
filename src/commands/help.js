@@ -62,6 +62,7 @@ const TOPICS = {
       '`/embed create name:welcome title:Welcome description:Grab a role in #roles color:#007AFF`',
       '`/embed field-add name:welcome label:Rules value:Be kind inline:False`',
       '`/embed media`, `/embed author`, and `/embed footer` fill the rest. Use `none` to clear a text or URL.',
+      '`/embed preset preset:rules` saves the flight manual. `preset:map` saves the sector map. Add `channel:` to post it.',
       '`/embed preview name:welcome` shows it to you.',
       '`/embed send name:welcome channel:#welcome` posts it.',
       'Names are lowercase letters, numbers, and hyphens.',

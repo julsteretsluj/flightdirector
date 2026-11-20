@@ -7,6 +7,7 @@ const { UserError } = require('../lib/errors');
 const { parseColor, parseHttpUrl, embedName, clearedText } = require('../lib/parse');
 const { ephemeral, sendableError, humanize } = require('../lib/discord');
 const { emptyPayload, isEmptyPayload, buildStoredEmbed } = require('../lib/stored-embed');
+const { presetPayload } = require('../lib/presets');
 
 function nameOption() {
   return (option) => option
@@ -91,6 +92,21 @@ module.exports = {
       .addStringOption((option) => option.setName('text').setDescription('Footer text, or none to clear').setMaxLength(2048))
       .addStringOption((option) => option.setName('icon').setDescription('Footer icon URL, or none to clear').setMaxLength(512)))
     .addSubcommand((sub) => sub
+      .setName('preset')
+      .setDescription('Save the rules or the sector map')
+      .addStringOption((option) => option
+        .setName('preset')
+        .setDescription('Which ready-made embed')
+        .setRequired(true)
+        .addChoices(
+          { name: 'rules', value: 'rules' },
+          { name: 'map', value: 'map' },
+        ))
+      .addChannelOption((option) => option
+        .setName('channel')
+        .setDescription('Also post it here')
+        .addChannelTypes(ChannelType.GuildText, ChannelType.GuildAnnouncement)))
+    .addSubcommand((sub) => sub
       .setName('preview')
       .setDescription('Preview an embed privately')
       .addStringOption(nameOption()))
@@ -134,6 +150,7 @@ module.exports = {
     if (sub === 'media') return media(interaction);
     if (sub === 'author') return author(interaction);
     if (sub === 'footer') return footer(interaction);
+    if (sub === 'preset') return usePreset(interaction);
     if (sub === 'preview') return preview(interaction);
     if (sub === 'send') return send(interaction);
     if (sub === 'list') return list(interaction);
@@ -292,6 +309,29 @@ async function footer(interaction) {
   row.payload.footer = current.text ? current : null;
   db.saveEmbedPayload(interaction.guildId, row.name, row.payload);
   await interaction.reply(ephemeral(`Updated the footer on \`${row.name}\`.`));
+}
+
+async function usePreset(interaction) {
+  const name = interaction.options.getString('preset', true);
+  const payload = presetPayload(name);
+  if (!payload) throw new UserError('That preset is not on this bot.');
+  if (db.getEmbed(interaction.guildId, name)) {
+    db.saveEmbedPayload(interaction.guildId, name, payload);
+  } else {
+    db.createEmbed(interaction.guildId, name, payload, interaction.user.id);
+  }
+  const channel = interaction.options.getChannel('channel');
+  if (channel) {
+    const problem = sendableError(channel, interaction.guild.members.me);
+    if (problem) throw new UserError(problem);
+    try {
+      await channel.send({ embeds: [buildStoredEmbed(payload)], allowedMentions: { parse: [] } });
+    } catch (error) {
+      throw new UserError(humanize(error) || 'Discord rejected that embed.');
+    }
+  }
+  const posted = channel ? ` Sent it to ${channel}.` : ' Preview it with `/embed preview`, or send it with `/embed send`.';
+  await interaction.reply(ephemeral(`Saved \`${name}\`.${posted}`));
 }
 
 async function preview(interaction) {
