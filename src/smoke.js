@@ -189,8 +189,8 @@ for (const [name, payload] of Object.entries(presets)) {
     payload.footer?.text,
     ...(payload.fields || []).flatMap((field) => [field.name, field.value]),
   ].join('\n');
-  if (name !== 'welcome') assert(!/[A-Z]/.test(text), `${name} stays lowercase`);
-  if (name === 'welcome') assert(payload.title.includes('{user}'), 'welcome names the member');
+  assert(!/[A-Z]/.test(text), `${name} stays lowercase`);
+  if (name === 'welcome') assert(payload.ping === true && !payload.title.includes('{user}'), 'welcome pings outside the embed');
   assert(payloadLength(payload) <= 6000, `${name} embed size`);
   assert((payload.fields || []).length <= 25, `${name} field count`);
   for (const field of payload.fields || []) {
@@ -256,7 +256,12 @@ const later = econ.tickCompanion({ ...pet, last_tick: 0, lifetime_ms: econ.DAY }
 assert(later.lifetime_ms === econ.DAY - econ.HOUR, 'pet tick');
 assert(econ.applyActivity('feed', { ...pet, food: 0, happiness: 80 }, null).error, 'feed needs food');
 assert(templates.fillTemplate('hi {user_name}', { userName: 'Jay' }) === 'hi Jay', 'template');
-assert(templates.fillPayload(presets.welcome, { user: '<@1>' }).title === '🛸 Welcome to 0G (Zero Gravity), <@1>!', 'welcome fill');
+db.createEmbed('guild', 'welcome', presets.welcome, 'owner');
+const welcomed = templates.renderFilled('guild', '{embed:welcome}', { user: '<@1>', userName: 'Jules' });
+assert(welcomed.content === '<@1>', 'welcome ping is outside the embed');
+assert(!welcomed.embeds[0].data.title.includes('<@'), 'welcome title has no mention');
+assert(!/[A-Z]/.test(`${welcomed.embeds[0].data.title}\n${welcomed.embeds[0].data.description}`), 'welcome stays lowercase');
+db.deleteEmbed('guild', 'welcome');
 assert(templates.splitEmbedToken('hello {embed:welcome}').embedName === 'welcome', 'embed token');
 
 const added = economyStore.addItem({ guildId: 'shopguild', name: 'cookie', price: 5, stock: 0 });

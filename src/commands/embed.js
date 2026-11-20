@@ -327,16 +327,13 @@ async function usePreset(interaction) {
     const problem = sendableError(channel, interaction.guild.members.me);
     if (problem) throw new UserError(problem);
     try {
-      await channel.send({
-        embeds: [buildStoredEmbed(shownEmbed(payload, interaction))],
-        allowedMentions: { users: [interaction.user.id], parse: [] },
-      });
+      await channel.send(outbound(payload, interaction));
     } catch (error) {
       throw new UserError(humanize(error) || 'Discord rejected that embed.');
     }
   }
   const next = name === 'welcome'
-    ? ' Turn it on with `/greet channel` and `/greet message message:{embed:welcome}`.'
+    ? ' Turn it on with `/greet channel` and `/greet message message:{embed:welcome}`. The ping is the message above the embed.'
     : ' Preview it with `/embed preview`, or send it with `/embed send`.';
   const posted = channel ? ` Sent it to ${channel}.` : next;
   await interaction.reply(ephemeral(`Saved \`${name}\`.${posted}`));
@@ -347,14 +344,24 @@ function shownEmbed(payload, interaction) {
   return fillPayload(payload, memberContext(interaction.member));
 }
 
+function outbound(payload, interaction) {
+  const userId = interaction.user?.id;
+  return {
+    content: payload.ping && userId ? `<@${userId}>` : undefined,
+    embeds: [buildStoredEmbed(shownEmbed(payload, interaction))],
+    allowedMentions: { users: userId ? [userId] : [], parse: [] },
+  };
+}
+
 async function preview(interaction) {
   const row = requireExisting(interaction);
   if (isEmptyPayload(row.payload)) throw new UserError(`\`${row.name}\` is still empty.`);
+  const message = outbound(row.payload, interaction);
   await interaction.reply({
-    content: `Preview of \`${row.name}\`.`,
-    embeds: [buildStoredEmbed(shownEmbed(row.payload, interaction))],
+    content: message.content || `Preview of \`${row.name}\`.`,
+    embeds: message.embeds,
     flags: ephemeral().flags,
-    allowedMentions: { users: [interaction.user.id], parse: [] },
+    allowedMentions: message.allowedMentions,
   });
 }
 
@@ -365,10 +372,7 @@ async function send(interaction) {
   const problem = sendableError(channel, interaction.guild.members.me);
   if (problem) throw new UserError(problem);
   try {
-    await channel.send({
-      embeds: [buildStoredEmbed(shownEmbed(row.payload, interaction))],
-      allowedMentions: { users: [interaction.user.id], parse: [] },
-    });
+    await channel.send(outbound(row.payload, interaction));
   } catch (error) {
     throw new UserError(humanize(error) || 'Discord rejected that embed. Check the image URLs.');
   }

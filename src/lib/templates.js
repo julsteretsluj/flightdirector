@@ -79,18 +79,23 @@ function fillPayload(payload, ctx) {
 
 function renderFilled(guildId, template, ctx) {
   const split = splitEmbedToken(template);
-  const content = neutralizePings(fillTemplate(split.text, ctx)).slice(0, 2000).trim();
+  let content = neutralizePings(fillTemplate(split.text, ctx)).slice(0, 2000).trim();
   const embeds = [];
+  let ping = false;
   if (split.embedName) {
     const row = db.getEmbed(guildId, split.embedName);
     if (row) {
       try {
+        ping = Boolean(row.payload.ping);
         const payload = sanitizePayload(fillValue(row.payload, ctx));
         if (!isEmptyPayload(payload)) embeds.push(buildStoredEmbed(payload));
       } catch {
         /* skip a broken embed and still send the text */
       }
     }
+  }
+  if (ping && ctx.user && !content.includes(ctx.user)) {
+    content = content ? `${ctx.user}\n${content}` : ctx.user;
   }
   return { content: content || null, embeds };
 }
