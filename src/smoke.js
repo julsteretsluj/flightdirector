@@ -15,6 +15,7 @@ const { presets, payloadLength } = require('./lib/presets');
 const { rolePresets } = require('./lib/role-presets');
 const { pageBody, renderPage } = require('./lib/page');
 const { renderPoll } = require('./features/polls');
+const { renderPanel } = require('./features/reaction-roles');
 
 const failures = [];
 
@@ -196,6 +197,20 @@ assert(origins.roles.every((role) => role.name.startsWith(`${role.emoji}・`)), 
 const optin = rolePresets.optin;
 assert(optin.roles.length === 5 && !optin.exclusive, 'opt-in preset allows more than one');
 assert(optin.roles.every((role) => role.name.startsWith(`${role.emoji}・`) && role.note && !/[A-Z]/.test(role.note)), 'opt-in notes stay lowercase');
+const neuroLine = renderPanel({
+  title: 'neurotypes',
+  description: 'self-id',
+  mode: 'reaction',
+  exclusive: 0,
+}, [{ emoji: '♾️', label: '♾️・autistic', role_id: '1' }]).embeds[0].data.description;
+assert(neuroLine.includes('♾️  autistic') && !neuroLine.includes('♾️  ♾️'), 'reaction line shows one emoji');
+const pronounLine = renderPanel({
+  title: 'pronouns',
+  description: 'react',
+  mode: 'reaction',
+  exclusive: 0,
+}, [{ emoji: '🩷', label: 'she/her', role_id: '1' }]).embeds[0].data.description;
+assert(pronounLine.includes('🩷  she/her'), 'pronoun line keeps its emoji');
 for (const preset of Object.values(rolePresets)) {
   const text = [preset.title, preset.description, ...preset.roles.map((role) => role.name)].join('\n');
   assert(!/[A-Z]/.test(text), `${preset.title} stays lowercase`);

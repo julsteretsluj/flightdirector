@@ -6,7 +6,8 @@ const { Client, GatewayIntentBits, Partials, Events } = require('discord.js');
 const { token } = require('./config');
 const { loadCommands } = require('./load-commands');
 const { handleInteraction } = require('./handlers/interaction');
-const { handleReaction } = require('./features/reaction-roles');
+const roles = require('./features/reaction-roles');
+const { handleReaction } = roles;
 const { sweepPolls } = require('./features/polls');
 const { sweepFocus } = require('./features/focus');
 const { handleProxy } = require('./features/system');
@@ -41,6 +42,7 @@ client.commands = loadCommands();
 
 client.once(Events.ClientReady, (readyClient) => {
   console.log(`Logged in as ${readyClient.user.tag}`);
+  roles.refreshAll(readyClient).catch((error) => console.error(error));
   const tick = () => {
     sweepPolls(readyClient).catch((error) => console.error(error));
     sweepFocus(readyClient).catch((error) => console.error(error));

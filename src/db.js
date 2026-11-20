@@ -593,6 +593,10 @@ function listPanels(guildId) {
   return db.prepare('SELECT * FROM rr_panels WHERE guild_id = ? ORDER BY id DESC').all(guildId);
 }
 
+function allPanels() {
+  return db.prepare('SELECT * FROM rr_panels ORDER BY id').all();
+}
+
 function deletePanel(id) {
   db.prepare('DELETE FROM rr_panels WHERE id = ?').run(id);
 }
@@ -799,6 +803,7 @@ module.exports = {
   getPanel,
   getPanelByMessage,
   listPanels,
+  allPanels,
   deletePanel,
   panelOptions,
   getPanelOption,

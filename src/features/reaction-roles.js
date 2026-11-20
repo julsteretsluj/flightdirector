@@ -28,6 +28,13 @@ const STYLES = {
   Danger: ButtonStyle.Danger,
 };
 
+function panelLabel(option, role) {
+  const label = option.label || role?.name || 'Role';
+  if (!option.emoji || !label.startsWith(option.emoji)) return label;
+  const rest = label.slice(option.emoji.length).replace(/^[\s・·\-–—]+/, '').trim();
+  return rest || label;
+}
+
 function renderPanel(panel, options, guild) {
   const lines = [];
   if (panel.description) lines.push(panel.description);
@@ -36,7 +43,7 @@ function renderPanel(panel, options, guild) {
     if (options.length) {
       lines.push(options.map((option) => {
         const role = guild?.roles?.cache?.get(option.role_id);
-        return `${option.emoji || '•'}  ${option.label || role?.name || 'Role'}`;
+        return `${option.emoji || '•'}  ${panelLabel(option, role)}`;
       }).join('\n'));
     } else {
       lines.push('No roles yet. Add some with `/reactionrole add`.');
@@ -54,7 +61,7 @@ function renderPanel(panel, options, guild) {
     ? chunk(options.map((option) => {
       const button = new ButtonBuilder()
         .setCustomId(`rr:${option.id}`)
-        .setLabel(option.label.slice(0, 80))
+        .setLabel(panelLabel(option).slice(0, 80))
         .setStyle(STYLES[option.style] || ButtonStyle.Secondary);
       const emoji = buttonEmoji(option.emoji);
       if (emoji) button.setEmoji(emoji.id ? { id: emoji.id, name: emoji.name, animated: emoji.animated } : emoji.name);
@@ -63,6 +70,17 @@ function renderPanel(panel, options, guild) {
     : [];
 
   return { embeds: [embed], components, allowedMentions: { parse: [] } };
+}
+
+async function refreshAll(client) {
+  for (const panel of db.allPanels()) {
+    try {
+      const guild = client.guilds.cache.get(panel.guild_id) || await client.guilds.fetch(panel.guild_id);
+      await refreshPanel(panel, guild);
+    } catch (error) {
+      console.error(`Could not refresh role panel ${panel.id}.`, error.message || error);
+    }
+  }
 }
 
 async function refreshPanel(panel, guild) {
@@ -414,4 +432,5 @@ module.exports = {
   handleButton,
   handleReaction,
   renderPanel,
+  refreshAll,
 };
