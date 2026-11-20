@@ -256,6 +256,8 @@ const later = econ.tickCompanion({ ...pet, last_tick: 0, lifetime_ms: econ.DAY }
 assert(later.lifetime_ms === econ.DAY - econ.HOUR, 'pet tick');
 assert(econ.applyActivity('feed', { ...pet, food: 0, happiness: 80 }, null).error, 'feed needs food');
 assert(templates.fillTemplate('hi {user_name}', { userName: 'Jay' }) === 'hi Jay', 'template');
+assert(templates.fillTemplate('{username} {user}', { userName: 'Jules', user: '<@1>' }) === 'jules <@1>', 'lowercase username');
+assert(templates.fillPayload(presets.leave, { userName: 'Jules' }).title === '🌌 jules has drifted out of orbit', 'leave name');
 db.createEmbed('guild', 'welcome', presets.welcome, 'owner');
 const welcomed = templates.renderFilled('guild', '{embed:welcome}', { user: '<@1>', userName: 'Jules' });
 assert(welcomed.content === '<@1>', 'welcome ping is outside the embed');

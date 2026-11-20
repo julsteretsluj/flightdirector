@@ -94,7 +94,7 @@ module.exports = {
       .addStringOption((option) => option.setName('icon').setDescription('Footer icon URL, or none to clear').setMaxLength(512)))
     .addSubcommand((sub) => sub
       .setName('preset')
-      .setDescription('Save the rules, the sector map, or the welcome')
+      .setDescription('Save rules, the map, the welcome, or the goodbye')
       .addStringOption((option) => option
         .setName('preset')
         .setDescription('Which ready-made embed')
@@ -103,6 +103,7 @@ module.exports = {
           { name: 'rules', value: 'rules' },
           { name: 'map', value: 'map' },
           { name: 'welcome', value: 'welcome' },
+          { name: 'leave', value: 'leave' },
         ))
       .addChannelOption((option) => option
         .setName('channel')
@@ -332,9 +333,11 @@ async function usePreset(interaction) {
       throw new UserError(humanize(error) || 'Discord rejected that embed.');
     }
   }
-  const next = name === 'welcome'
-    ? ' Turn it on with `/greet channel` and `/greet message message:{embed:welcome}`. The ping is the message above the embed.'
-    : ' Preview it with `/embed preview`, or send it with `/embed send`.';
+  const hints = {
+    welcome: ' Turn it on with `/greet channel` and `/greet message message:{embed:welcome}`. The ping is the message above the embed.',
+    leave: ' Turn it on with `/greet leave-channel` and `/greet leave-message message:{embed:leave}`. It posts when someone leaves.',
+  };
+  const next = hints[name] || ' Preview it with `/embed preview`, or send it with `/embed send`.';
   const posted = channel ? ` Sent it to ${channel}.` : next;
   await interaction.reply(ephemeral(`Saved \`${name}\`.${posted}`));
 }

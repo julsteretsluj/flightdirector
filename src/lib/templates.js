@@ -9,6 +9,7 @@ function fillTemplate(text, ctx) {
   return source
     .replaceAll('{user_avatar}', ctx.userAvatar || '')
     .replaceAll('{server_icon}', ctx.serverIcon || '')
+    .replaceAll('{username}', (ctx.userName || 'someone').toLowerCase())
     .replaceAll('{user_name}', ctx.userName || '')
     .replaceAll('{user_tag}', ctx.userName || '')
     .replaceAll('{server_name}', ctx.serverName || '')

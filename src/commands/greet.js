@@ -36,7 +36,7 @@ module.exports = {
     .addSubcommand((sub) => sub
       .setName('leave-message')
       .setDescription('Set the goodbye message')
-      .addStringOption(messageOption('Supports {user}, {user_name}, {newline}, and {embed:name}')))
+      .addStringOption(messageOption('Supports {username}, {user_name}, {newline}, and {embed:name}')))
     .addSubcommand((sub) => sub
       .setName('leave-channel')
       .setDescription('Channel for goodbye messages')

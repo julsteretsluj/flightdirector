@@ -151,7 +151,14 @@ const welcome = {
   ping: true,
 };
 
-const presets = { rules, map, welcome };
+const leave = {
+  title: '🌌 {username} has drifted out of orbit',
+  description: 'wishing you calm skies, plenty of spoons, and good rest wherever your next stop is.',
+  color: NIGHT,
+  footer: { text: '0g · calm skies' },
+};
+
+const presets = { rules, map, welcome, leave };
 
 function presetPayload(name) {
   const preset = presets[name];

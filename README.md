@@ -52,7 +52,8 @@ Data lives in `data/0gbot.sqlite`.
 | `/ambient join` | Quiet generated noise in your voice channel |
 | `/reactionrole panel` | Buttons or reactions for pronouns, pings, or channel access |
 | `/embed create` | Save an embed and send it later |
-| `/embed preset` | Save the rules, sector map, or welcome. The welcome ping sits above the embed |
+| `/embed preset` | Save the rules, sector map, welcome, or goodbye |
+| `/greet leave-message` | Goodbye when someone leaves. `{username}` is their name in lowercase |
 | `/profile edit` | Carrd-style page |
 | `/poll create` | A poll |
 | `/confess setup` | Anonymous confessions |
