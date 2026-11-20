@@ -205,19 +205,19 @@ async function deletePanel(interaction) {
   await interaction.editReply('Panel removed.');
 }
 
-async function ensureRole(guild, name) {
+async function ensureRole(guild, name, reason) {
   const exact = guild.roles.cache.find((role) => role.name === name);
   if (exact) return exact;
   const folded = guild.roles.cache.find((role) => role.name.toLowerCase() === name.toLowerCase());
   if (folded) {
-    if (folded.name !== name) await folded.setName(name, 'Lowercase neurotype preset');
+    if (folded.name !== name) await folded.setName(name, reason);
     return folded;
   }
   return guild.roles.create({
     name,
     permissions: [],
     mentionable: false,
-    reason: 'Neurotype reaction role preset',
+    reason,
   });
 }
 
@@ -236,7 +236,7 @@ async function postPreset(interaction) {
   for (const entry of preset.roles) {
     let role;
     try {
-      role = await ensureRole(interaction.guild, entry.name);
+      role = await ensureRole(interaction.guild, entry.name, preset.title);
     } catch (error) {
       throw new UserError(humanize(error) || `I could not create **${entry.name}**.`);
     }

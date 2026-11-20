@@ -96,6 +96,7 @@ module.exports = {
         .addChoices(
           { name: 'neurotypes', value: 'neurotypes' },
           { name: 'pronouns', value: 'pronouns' },
+          { name: 'boundaries', value: 'boundaries' },
         ))
       .addChannelOption((option) => option
         .setName('channel')

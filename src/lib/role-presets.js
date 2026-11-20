@@ -43,4 +43,18 @@ const pronouns = {
   ],
 };
 
-module.exports = { rolePresets: { neurotypes, pronouns } };
+const boundaries = {
+  title: '📡 comms & boundaries',
+  description: 'let the crew know how you prefer to communicate and whether dms are open.',
+  color: NIGHT,
+  roles: [
+    { emoji: '📡', name: '📡・dms open' },
+    { emoji: '📶', name: '📶・ask before dming' },
+    { emoji: '📵', name: '📵・dms closed' },
+    { emoji: '🏷️', name: '🏷️・tone tags appreciated' },
+    { emoji: '🎯', name: '🎯・direct & literal' },
+    { emoji: '🪫', name: '🪫・slow replies' },
+  ],
+};
+
+module.exports = { rolePresets: { neurotypes, pronouns, boundaries } };
