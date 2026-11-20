@@ -73,6 +73,10 @@ function sanitizePayload(payload) {
   return next;
 }
 
+function fillPayload(payload, ctx) {
+  return sanitizePayload(fillValue(payload, ctx));
+}
+
 function renderFilled(guildId, template, ctx) {
   const split = splitEmbedToken(template);
   const content = neutralizePings(fillTemplate(split.text, ctx)).slice(0, 2000).trim();
@@ -120,6 +124,7 @@ function messageContext(message) {
 
 module.exports = {
   fillTemplate,
+  fillPayload,
   splitEmbedToken,
   renderFilled,
   memberContext,

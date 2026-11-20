@@ -134,7 +134,23 @@ const map = {
   ],
 };
 
-const presets = { rules, map };
+const welcome = {
+  title: '🛸 Welcome to 0G (Zero Gravity), {user}!',
+  description: [
+    'Step out of heavy gravity and float in at your own pace—whether you\'re here to infodump, body-double, or hang out low-key.',
+    '',
+    '• **Rules & Boundaries:** `#📜・flight-manual`',
+    '• **Roles & Opt-In Spaces:** `#🪪・crew-manifest`',
+    '• **Optional Intros:** `#🧑‍🚀・boarding-pass` *(zero pressure!)*',
+    '• **Low-Energy Space:** `#🌑・low-gravity`',
+    '',
+    'Need help or have a question? Reach out in `#📬・control-tower`.',
+  ].join('\n'),
+  color: NIGHT,
+  footer: { text: '0g · arrive at your own pace' },
+};
+
+const presets = { rules, map, welcome };
 
 function presetPayload(name) {
   const preset = presets[name];

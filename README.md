@@ -52,7 +52,7 @@ Data lives in `data/0gbot.sqlite`.
 | `/ambient join` | Quiet generated noise in your voice channel |
 | `/reactionrole panel` | Buttons or reactions for pronouns, pings, or channel access |
 | `/embed create` | Save an embed and send it later |
-| `/embed preset` | Save the lowercase rules or sector map, and post it |
+| `/embed preset` | Save the rules, sector map, or welcome. `{user}` is the new member |
 | `/profile edit` | Carrd-style page |
 | `/poll create` | A poll |
 | `/confess setup` | Anonymous confessions |

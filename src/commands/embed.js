@@ -8,6 +8,7 @@ const { parseColor, parseHttpUrl, embedName, clearedText } = require('../lib/par
 const { ephemeral, sendableError, humanize } = require('../lib/discord');
 const { emptyPayload, isEmptyPayload, buildStoredEmbed } = require('../lib/stored-embed');
 const { presetPayload } = require('../lib/presets');
+const { fillPayload, memberContext } = require('../lib/templates');
 
 function nameOption() {
   return (option) => option
@@ -93,7 +94,7 @@ module.exports = {
       .addStringOption((option) => option.setName('icon').setDescription('Footer icon URL, or none to clear').setMaxLength(512)))
     .addSubcommand((sub) => sub
       .setName('preset')
-      .setDescription('Save the rules or the sector map')
+      .setDescription('Save the rules, the sector map, or the welcome')
       .addStringOption((option) => option
         .setName('preset')
         .setDescription('Which ready-made embed')
@@ -101,6 +102,7 @@ module.exports = {
         .addChoices(
           { name: 'rules', value: 'rules' },
           { name: 'map', value: 'map' },
+          { name: 'welcome', value: 'welcome' },
         ))
       .addChannelOption((option) => option
         .setName('channel')
@@ -325,13 +327,24 @@ async function usePreset(interaction) {
     const problem = sendableError(channel, interaction.guild.members.me);
     if (problem) throw new UserError(problem);
     try {
-      await channel.send({ embeds: [buildStoredEmbed(payload)], allowedMentions: { parse: [] } });
+      await channel.send({
+        embeds: [buildStoredEmbed(shownEmbed(payload, interaction))],
+        allowedMentions: { users: [interaction.user.id], parse: [] },
+      });
     } catch (error) {
       throw new UserError(humanize(error) || 'Discord rejected that embed.');
     }
   }
-  const posted = channel ? ` Sent it to ${channel}.` : ' Preview it with `/embed preview`, or send it with `/embed send`.';
+  const next = name === 'welcome'
+    ? ' Turn it on with `/greet channel` and `/greet message message:{embed:welcome}`.'
+    : ' Preview it with `/embed preview`, or send it with `/embed send`.';
+  const posted = channel ? ` Sent it to ${channel}.` : next;
   await interaction.reply(ephemeral(`Saved \`${name}\`.${posted}`));
+}
+
+function shownEmbed(payload, interaction) {
+  if (!interaction.member) return payload;
+  return fillPayload(payload, memberContext(interaction.member));
 }
 
 async function preview(interaction) {
@@ -339,8 +352,9 @@ async function preview(interaction) {
   if (isEmptyPayload(row.payload)) throw new UserError(`\`${row.name}\` is still empty.`);
   await interaction.reply({
     content: `Preview of \`${row.name}\`.`,
-    embeds: [buildStoredEmbed(row.payload)],
+    embeds: [buildStoredEmbed(shownEmbed(row.payload, interaction))],
     flags: ephemeral().flags,
+    allowedMentions: { users: [interaction.user.id], parse: [] },
   });
 }
 
@@ -351,7 +365,10 @@ async function send(interaction) {
   const problem = sendableError(channel, interaction.guild.members.me);
   if (problem) throw new UserError(problem);
   try {
-    await channel.send({ embeds: [buildStoredEmbed(row.payload)], allowedMentions: { parse: [] } });
+    await channel.send({
+      embeds: [buildStoredEmbed(shownEmbed(row.payload, interaction))],
+      allowedMentions: { users: [interaction.user.id], parse: [] },
+    });
   } catch (error) {
     throw new UserError(humanize(error) || 'Discord rejected that embed. Check the image URLs.');
   }
