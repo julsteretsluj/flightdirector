@@ -99,6 +99,7 @@ module.exports = {
           { name: 'boundaries', value: 'boundaries' },
           { name: 'age', value: 'age' },
           { name: 'origins', value: 'origins' },
+          { name: 'opt-in', value: 'optin' },
         ))
       .addChannelOption((option) => option
         .setName('channel')

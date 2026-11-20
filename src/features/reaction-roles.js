@@ -270,7 +270,7 @@ async function postPreset(interaction) {
         panel_id: panel.id,
         role_id: entry.role.id,
         emoji: entry.emoji,
-        label: entry.name,
+        label: entry.note ? `${entry.name} ${entry.note}` : entry.name,
         style: 'Secondary',
       });
       const emoji = buttonEmoji(entry.emoji);

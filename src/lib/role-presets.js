@@ -89,4 +89,17 @@ const origins = {
   ],
 };
 
-module.exports = { rolePresets: { neurotypes, pronouns, boundaries, age, origins } };
+const optin = {
+  title: '🔓 opt-in spaces & pings',
+  description: 'toggle access to sensitive channels and opt-in pings so your feed matches your energy.',
+  color: NIGHT,
+  roles: [
+    { emoji: '🖤', name: '🖤・black hole access', note: '(unlocks #🖤・black-hole)' },
+    { emoji: '🩺', name: '🩺・med bay access', note: '(unlocks #🩺・med-bay)' },
+    { emoji: '⏳', name: '⏳・body-double pings', note: '(pings for #⏳・orbit-together)' },
+    { emoji: '🍿', name: '🍿・event pings', note: '(pings for events & watch parties)' },
+    { emoji: '🎮', name: '🎮・game night pings', note: '(pings for gaming sessions)' },
+  ],
+};
+
+module.exports = { rolePresets: { neurotypes, pronouns, boundaries, age, origins, optin } };
