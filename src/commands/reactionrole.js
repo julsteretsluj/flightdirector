@@ -88,12 +88,15 @@ module.exports = {
       .setDescription('List role panels in this server'))
     .addSubcommand((sub) => sub
       .setName('preset')
-      .setDescription('Post the neurotype reaction roles')
+      .setDescription('Post a ready-made reaction role panel')
       .addStringOption((option) => option
         .setName('preset')
         .setDescription('Which role panel')
         .setRequired(true)
-        .addChoices({ name: 'neurotypes', value: 'neurotypes' }))
+        .addChoices(
+          { name: 'neurotypes', value: 'neurotypes' },
+          { name: 'pronouns', value: 'pronouns' },
+        ))
       .addChannelOption((option) => option
         .setName('channel')
         .setDescription('Where to post the panel')

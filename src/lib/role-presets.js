@@ -26,4 +26,21 @@ const neurotypes = {
   ],
 };
 
-module.exports = { rolePresets: { neurotypes } };
+const pronouns = {
+  title: '🗣️ pronouns',
+  description: 'react with any pronouns that feel right. you can pick multiple or change them whenever you want.',
+  color: NIGHT,
+  roles: [
+    { emoji: '🩷', name: 'she/her' },
+    { emoji: '🩵', name: 'he/him' },
+    { emoji: '💜', name: 'they/them' },
+    { emoji: '💎', name: 'it/its' },
+    { emoji: '⭐', name: 'xe/xem' },
+    { emoji: '🌿', name: 'ze/zir' },
+    { emoji: '🧡', name: 'any pronouns' },
+    { emoji: '🤍', name: 'ask for pronouns' },
+    { emoji: '🌙', name: 'pronouns in bio' },
+  ],
+};
+
+module.exports = { rolePresets: { neurotypes, pronouns } };

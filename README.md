@@ -51,7 +51,7 @@ Data lives in `data/0gbot.sqlite`.
 | `/mod warn` | Warning, timeout, kick, ban, and case history |
 | `/ambient join` | Quiet generated noise in your voice channel |
 | `/reactionrole panel` | Buttons or reactions for pronouns, pings, or channel access |
-| `/reactionrole preset` | Neurotype panel. Each reaction toggles its role |
+| `/reactionrole preset` | Neurotype or pronoun panel. Each reaction toggles its role |
 | `/embed create` | Save an embed and send it later |
 | `/embed preset` | Save the rules, sector map, welcome, or goodbye |
 | `/greet leave-message` | Goodbye when someone leaves. `{username}` is their name in lowercase |

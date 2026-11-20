@@ -179,11 +179,16 @@ assert(db.panelOptions(panel.id).length === 0, 'deleting a panel removes its rol
 assert(db.getPanel(panel.id) === null, 'panel deleted');
 
 const neurotypes = rolePresets.neurotypes;
-const neuroText = [neurotypes.title, neurotypes.description, ...neurotypes.roles.map((role) => role.name)].join('\n');
-assert(!/[A-Z]/.test(neuroText), 'neurotype preset stays lowercase');
 assert(neurotypes.roles.length === 16, 'neurotype role count');
-assert(new Set(neurotypes.roles.map((role) => role.emoji)).size === neurotypes.roles.length, 'neurotype emojis are unique');
 assert(neurotypes.roles.every((role) => role.name.startsWith(`${role.emoji}・`)), 'neurotype names keep their emoji');
+const pronouns = rolePresets.pronouns;
+assert(pronouns.roles.length === 9, 'pronoun role count');
+assert(pronouns.roles.some((role) => role.name === 'they/them'), 'they/them role');
+for (const preset of Object.values(rolePresets)) {
+  const text = [preset.title, preset.description, ...preset.roles.map((role) => role.name)].join('\n');
+  assert(!/[A-Z]/.test(text), `${preset.title} stays lowercase`);
+  assert(new Set(preset.roles.map((role) => role.emoji)).size === preset.roles.length, `${preset.title} emojis are unique`);
+}
 
 db.createEmbed('guild', 'welcome', { ...emptyPayload(), title: 'Welcome' }, 'owner');
 assert(db.embedNames('guild').includes('welcome'), 'embed list');
