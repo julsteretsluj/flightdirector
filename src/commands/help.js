@@ -30,6 +30,7 @@ const TOPICS = {
       'Reaction mode needs an emoji on every role. Button mode can use a label alone.',
       'Exclusive panels keep a single role from that panel.',
       'Use the same panel for pronouns, communication preferences, ping roles, or access to a private channel. Give that role permission to see the channel in its settings. The bot only toggles the role.',
+      '`/reactionrole preset preset:neurotypes channel:#crew-manifest` posts the lowercase neurotype list and adds a reaction for each role. Missing roles are created.',
       '`/reactionrole remove` and `/reactionrole delete` take the same message link.',
     ].join('\n'),
   },

@@ -85,7 +85,20 @@ module.exports = {
         .setRequired(true)))
     .addSubcommand((sub) => sub
       .setName('list')
-      .setDescription('List role panels in this server')),
+      .setDescription('List role panels in this server'))
+    .addSubcommand((sub) => sub
+      .setName('preset')
+      .setDescription('Post the neurotype reaction roles')
+      .addStringOption((option) => option
+        .setName('preset')
+        .setDescription('Which role panel')
+        .setRequired(true)
+        .addChoices({ name: 'neurotypes', value: 'neurotypes' }))
+      .addChannelOption((option) => option
+        .setName('channel')
+        .setDescription('Where to post the panel')
+        .setRequired(true)
+        .addChannelTypes(ChannelType.GuildText, ChannelType.GuildAnnouncement))),
 
   async execute(interaction) {
     const sub = interaction.options.getSubcommand();
@@ -94,6 +107,7 @@ module.exports = {
     if (sub === 'remove') return roles.removeOption(interaction);
     if (sub === 'delete') return roles.deletePanel(interaction);
     if (sub === 'list') return roles.listPanels(interaction);
+    if (sub === 'preset') return roles.postPreset(interaction);
     throw new Error(`Unknown reactionrole subcommand ${sub}`);
   },
 };

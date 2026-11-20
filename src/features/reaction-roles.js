@@ -17,7 +17,9 @@ const {
   messageLink,
   buttonEmoji,
   sameEmoji,
+  humanize,
 } = require('../lib/discord');
+const { rolePresets } = require('../lib/role-presets');
 
 const STYLES = {
   Primary: ButtonStyle.Primary,
@@ -203,6 +205,88 @@ async function deletePanel(interaction) {
   await interaction.editReply('Panel removed.');
 }
 
+async function ensureRole(guild, name) {
+  const exact = guild.roles.cache.find((role) => role.name === name);
+  if (exact) return exact;
+  const folded = guild.roles.cache.find((role) => role.name.toLowerCase() === name.toLowerCase());
+  if (folded) {
+    if (folded.name !== name) await folded.setName(name, 'Lowercase neurotype preset');
+    return folded;
+  }
+  return guild.roles.create({
+    name,
+    permissions: [],
+    mentionable: false,
+    reason: 'Neurotype reaction role preset',
+  });
+}
+
+async function postPreset(interaction) {
+  const key = interaction.options.getString('preset', true);
+  const preset = rolePresets[key];
+  if (!preset) throw new UserError('That preset is not on this bot.');
+  const channel = interaction.options.getChannel('channel', true);
+  const problem = sendableError(channel, interaction.guild.members.me);
+  if (problem) throw new UserError(problem);
+  if (preset.roles.length > 20) throw new UserError('A panel can hold 20 roles.');
+  await interaction.deferReply({ flags: ephemeral().flags });
+
+  await interaction.guild.roles.fetch();
+  const ready = [];
+  for (const entry of preset.roles) {
+    let role;
+    try {
+      role = await ensureRole(interaction.guild, entry.name);
+    } catch (error) {
+      throw new UserError(humanize(error) || `I could not create **${entry.name}**.`);
+    }
+    const blocked = roleAssignmentError(interaction.guild, role);
+    if (blocked) throw new UserError(blocked);
+    ready.push({ ...entry, role });
+  }
+
+  const draft = {
+    title: preset.title,
+    description: preset.description,
+    color: preset.color,
+    mode: 'reaction',
+    exclusive: false,
+  };
+  const message = await channel.send(renderPanel(draft, [], interaction.guild));
+  const panel = db.createPanel({
+    guild_id: interaction.guildId,
+    channel_id: channel.id,
+    message_id: message.id,
+    title: preset.title,
+    description: preset.description,
+    color: preset.color,
+    mode: 'reaction',
+    exclusive: 0,
+  });
+
+  try {
+    for (const entry of ready) {
+      db.addPanelOption({
+        panel_id: panel.id,
+        role_id: entry.role.id,
+        emoji: entry.emoji,
+        label: entry.name,
+        style: 'Secondary',
+      });
+      const emoji = buttonEmoji(entry.emoji);
+      await message.react(emoji.react);
+    }
+    await message.edit(renderPanel(panel, db.panelOptions(panel.id), interaction.guild));
+  } catch (error) {
+    db.deletePanel(panel.id);
+    await message.delete().catch(() => {});
+    throw new UserError(humanize(error) || 'I could not finish that panel.');
+  }
+
+  const link = messageLink(interaction.guildId, channel.id, message.id);
+  await interaction.editReply(`Posted **${preset.title}** in ${channel} with ${ready.length} reactions.\n${link}`);
+}
+
 async function listPanels(interaction) {
   const panels = db.listPanels(interaction.guildId);
   if (!panels.length) {
@@ -326,6 +410,7 @@ module.exports = {
   removeOption,
   deletePanel,
   listPanels,
+  postPreset,
   handleButton,
   handleReaction,
   renderPanel,
