@@ -31,7 +31,7 @@ const STYLES = {
 function renderPanel(panel, options, guild) {
   const lines = [];
   if (panel.description) lines.push(panel.description);
-  if (panel.exclusive) lines.push('You can hold one role from this panel.');
+  if (panel.exclusive) lines.push('you can hold one role from this panel.');
   if (panel.mode === 'reaction') {
     if (options.length) {
       lines.push(options.map((option) => {
@@ -250,7 +250,7 @@ async function postPreset(interaction) {
     description: preset.description,
     color: preset.color,
     mode: 'reaction',
-    exclusive: false,
+    exclusive: Boolean(preset.exclusive),
   };
   const message = await channel.send(renderPanel(draft, [], interaction.guild));
   const panel = db.createPanel({
@@ -261,7 +261,7 @@ async function postPreset(interaction) {
     description: preset.description,
     color: preset.color,
     mode: 'reaction',
-    exclusive: 0,
+    exclusive: preset.exclusive ? 1 : 0,
   });
 
   try {

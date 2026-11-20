@@ -57,4 +57,18 @@ const boundaries = {
   ],
 };
 
-module.exports = { rolePresets: { neurotypes, pronouns, boundaries } };
+const age = {
+  title: '🎂 age range (optional)',
+  description: 'sharing your age bracket is completely optional.',
+  color: NIGHT,
+  exclusive: true,
+  roles: [
+    { emoji: '🌱', name: '🌱・under 18' },
+    { emoji: '🌙', name: '🌙・18–20' },
+    { emoji: '☄️', name: '☄️・21–24' },
+    { emoji: '🪐', name: '🪐・25–29' },
+    { emoji: '🌠', name: '🌠・30+' },
+  ],
+};
+
+module.exports = { rolePresets: { neurotypes, pronouns, boundaries, age } };

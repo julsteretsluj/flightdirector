@@ -97,6 +97,7 @@ module.exports = {
           { name: 'neurotypes', value: 'neurotypes' },
           { name: 'pronouns', value: 'pronouns' },
           { name: 'boundaries', value: 'boundaries' },
+          { name: 'age', value: 'age' },
         ))
       .addChannelOption((option) => option
         .setName('channel')

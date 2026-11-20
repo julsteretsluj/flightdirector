@@ -187,6 +187,9 @@ assert(pronouns.roles.some((role) => role.name === 'they/them'), 'they/them role
 const boundaries = rolePresets.boundaries;
 assert(boundaries.roles.length === 6, 'boundary role count');
 assert(boundaries.roles.every((role) => role.name.startsWith(`${role.emoji}・`)), 'boundary names keep their emoji');
+const age = rolePresets.age;
+assert(age.roles.length === 5 && age.exclusive === true, 'age preset is one bracket');
+assert(age.roles.every((role) => role.name.startsWith(`${role.emoji}・`)), 'age names keep their emoji');
 for (const preset of Object.values(rolePresets)) {
   const text = [preset.title, preset.description, ...preset.roles.map((role) => role.name)].join('\n');
   assert(!/[A-Z]/.test(text), `${preset.title} stays lowercase`);
